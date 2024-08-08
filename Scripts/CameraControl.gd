@@ -1,45 +1,65 @@
 extends Camera2D
 
-signal camera_updated
+@export var zoomSpeed : float = 10.0
 
-# Variables for camera movement
-var drag_active = false
-var last_mouse_position = Vector2()
-var target_position = Vector2()
+var zoomTarget : Vector2
+var dragStartMousePos = Vector2.ZERO
+var dragStartCameraPos = Vector2.ZERO
+var isDragging : bool = false
 
-# Variables for zoom limits
-var min_zoom = 0.1
-var max_zoom = 3.0
-var move_speed = 10.0  # Speed of camera movement interpolation
+# Tolerance value to consider zoom and zoomTarget as equal
+var tolerance = 0.0001
+
+func _ready():
+	zoomTarget = zoom
 
 func _process(delta):
-	handle_camera_movement()
-	handle_zoom()
-	smooth_camera_movement(delta)
-	emit_signal("camera_updated")
+	Zoom(delta)
+	SimplePan(delta)
+	ClickAndDrag()
 
-func handle_camera_movement():
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
-		if not drag_active:
-			drag_active = true
-			last_mouse_position = get_global_mouse_position()
-		else:
-			var mouse_movement = last_mouse_position - get_global_mouse_position()
-			target_position += mouse_movement / zoom  # Adjust movement speed with zoom
-			last_mouse_position = get_global_mouse_position()
-	else:
-		drag_active = false
+func Zoom(delta):
+	if self.zoom.distance_to(zoomTarget) > tolerance:
+		zoom = zoom.slerp(zoomTarget, zoomSpeed * delta)
 
-func smooth_camera_movement(delta):
-	position = lerp(position, target_position, move_speed * delta)
+func SimplePan(delta):
+	var moveAmount = Vector2.ZERO
+	if Input.is_action_pressed("camera_move_right"):
+		moveAmount.x += 1
 
-func handle_zoom():
-	var zoom_factor = 1.1
-	if Input.is_action_just_pressed("zoom_in"):
-		zoom *= zoom_factor
-		if zoom.x > max_zoom:
-			zoom = Vector2(max_zoom, max_zoom)
-	elif Input.is_action_just_pressed("zoom_out"):
-		zoom /= zoom_factor
-		if zoom.x < min_zoom:
-			zoom = Vector2(min_zoom, min_zoom)
+	if Input.is_action_pressed("camera_move_left"):
+		moveAmount.x -= 1
+
+	if Input.is_action_pressed("camera_move_up"):
+		moveAmount.y -= 1
+
+	if Input.is_action_pressed("camera_move_down"):
+		moveAmount.y += 1
+
+	moveAmount = moveAmount.normalized()
+	position += moveAmount * delta * 1000 * (1/zoom.x)
+
+func ClickAndDrag():
+	if not isDragging and Input.is_action_just_pressed("camera_pan"):
+		dragStartMousePos = get_viewport().get_mouse_position()
+		dragStartCameraPos = position
+		isDragging = true
+
+	if isDragging and Input.is_action_just_released("camera_pan"):
+		isDragging = false
+
+	if isDragging:
+		var moveVector = get_viewport().get_mouse_position() - dragStartMousePos
+		position = dragStartCameraPos - moveVector * 1/zoom.x
+
+# Function to set the zoom target from other scripts
+func set_zoom_target(target_zoom: Vector2):
+	zoomTarget = target_zoom
+
+# Example input handling to change the zoom target
+func _input(event):
+	if Input.is_action_just_pressed("camera_zoom_in"):
+		set_zoom_target(zoomTarget * 1.1)
+		
+	if Input.is_action_just_pressed("camera_zoom_out"):
+		set_zoom_target(zoomTarget * 0.9)

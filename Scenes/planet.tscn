@@ -8,6 +8,7 @@ radius = 50.04
 [node name="Planet" type="Node2D"]
 
 [node name="Planet" type="RigidBody2D" parent="."]
+continuous_cd = 1
 max_contacts_reported = 1
 contact_monitor = true
 script = ExtResource("1_pb783")

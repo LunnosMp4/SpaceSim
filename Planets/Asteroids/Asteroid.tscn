@@ -25,7 +25,5 @@ script = ExtResource("3")
 [node name="Asteroid" type="ColorRect" parent="." index="0"]
 material = SubResource("1")
 layout_mode = 0
-offset_left = -50.0
-offset_top = -50.0
-offset_right = 50.0
-offset_bottom = 50.0
+offset_right = 100.0
+offset_bottom = 100.0
