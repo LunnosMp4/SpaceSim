@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://yh74n7nuovsx"]
 
-[ext_resource type="Texture2D" uid="uid://cb0qxjmda158v" path="res://Images/Stars Small_1.png" id="1_0lxh4"]
+[ext_resource type="Texture2D" uid="uid://cb0qxjmda158v" path="res://Assets/Images/Stars Small_1.png" id="1_0lxh4"]
 [ext_resource type="Script" path="res://Scenes/ParallaxBackground.gd" id="1_y8nv1"]
 
 [node name="Background" type="Node2D"]

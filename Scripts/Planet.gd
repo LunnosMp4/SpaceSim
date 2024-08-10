@@ -2,13 +2,14 @@ extends RigidBody2D
 
 const G = 6.67430e-16
 
+var body_name = "Default"
 var custom_mass = 5.972e24
 var initial_velocity = Vector2()
 var last_force = Vector2()
-var position_history = []
 var is_colliding = false
 var planet_type = "Terran Wet"
-var sun_global_position = Vector2()
+var target_scale = Vector2(1, 1)
+var orbiting_planet = null  # The planet this body is orbiting around
 
 @onready var planets = {
 	"Terran Wet": preload("res://Planets/Rivers/Rivers.tscn"),
@@ -25,8 +26,28 @@ var sun_global_position = Vector2()
 	"Star": preload("res://Planets/Star/Star.tscn"),
 }
 
+var densities = {
+	"Terran Wet": 5514,
+	"Terran Dry": 3933,
+	"Islands": 5200,
+	"No atmosphere": 3340,
+	"Gas giant 1": 1326,
+	"Gas giant 2": 700,
+	"Ice World": 1600,
+	"Lava World": 4100,
+	"Asteroid": 2000,
+	"Black Hole": 1e18,
+	"Galaxy": 1e-21,
+	"Star": 1408,
+}
+
+var batch_size = 10  # Number of planets to process per frame
+var current_batch_start = 0
+
 func _ready():
 	self.mass = custom_mass
+	calculate_scale_based_on_mass_and_type()
+	scale_visual_and_collision()
 
 	var planet_scene = planets[planet_type]
 	var planet = planet_scene.instantiate()
@@ -36,17 +57,36 @@ func _ready():
 	add_to_group("planets")
 	print("Planet ready with mass: ", custom_mass)
 	apply_central_impulse(initial_velocity)
-	connect("body_entered", Callable(self, "_on_body_entered"))
-	connect("body_exited", Callable(self, "_on_body_exited"))
 
 func _physics_process(_delta):
-	for body in get_tree().get_nodes_in_group("planets"):
-		if body != self:
-			apply_gravity(body, _delta)
-			if is_colliding and body.mass > self.mass:
-				queue_free()
+	self.scale = target_scale
+	var bodies = get_tree().get_nodes_in_group("planets")
+	var strongest_force = 0.0
+	orbiting_planet = null 
 
-func apply_gravity(body, _delta):
+	for i in range(current_batch_start, min(current_batch_start + batch_size, bodies.size())):
+		var body = bodies[i]
+		if body != self:
+			check_collision_proximity(body)
+			var force_magnitude = apply_gravity(body, _delta)
+			if force_magnitude > strongest_force:
+				strongest_force = force_magnitude
+				orbiting_planet = body
+
+	var is_most_massive = true
+	for body in bodies:
+		if body != self and body.mass > self.mass:
+			is_most_massive = false
+			break
+
+	if is_most_massive:
+		orbiting_planet = self
+
+	current_batch_start += batch_size
+	if current_batch_start >= bodies.size():
+		current_batch_start = 0
+
+func apply_gravity(body, _delta) -> float:
 	if body is RigidBody2D:
 		var direction = body.global_position - global_position
 		var distance_squared = direction.length_squared()
@@ -58,30 +98,47 @@ func apply_gravity(body, _delta):
 			var force = direction.normalized() * force_magnitude
 			apply_force(force * _delta, Vector2())  # Apply continuous force
 			last_force = force  # Store the last applied force for debug drawing
+			return force_magnitude  # Return the force magnitude for orbit calculation
+	return 0.0
 
-# Fonction pour normaliser la position de la lumière
-func normalize_light_position(position: Vector2) -> Vector2:
-	var max_distance = 1e3
-	var normalized_position = position / max_distance  # Divisez par la distance maximale
-	normalized_position.x = clamp(normalized_position.x, 0, 1)  # Assurez-vous que la valeur est entre 0 et 1
-	normalized_position.y = clamp(normalized_position.y, 0, 1)  # Assurez-vous que la valeur est entre 0 et 1
-	print(normalized_position)
-	return normalized_position
+func check_collision_proximity(body):
+	if body is RigidBody2D:
+		var combined_radius = get_radius() + body.get_radius()
+		var distance = global_position.distance_to(body.global_position)
+		
+		if distance < combined_radius:
+			handle_collision(body)
 
-func set_sun_position(position: Vector2):
-	sun_global_position = position
+func get_radius():
+	return target_scale.x * 50
 
-func update_light_position():
-	var light_position = normalize_light_position(sun_global_position - global_position)
-	for planet in get_children():
-		if planet.has_method("set_light"):
-			planet.set_light(light_position)
+func handle_collision(body):
+	if body.mass > self.mass:
+		queue_free()
 
-func _on_body_entered(body):
-	is_colliding = true
+func scale_visual_and_collision():
+	for child in get_children():
+		if child is CollisionShape2D:
+			child.scale = target_scale
 
-func _on_body_exited(body):
-	is_colliding = false
+func calculate_scale_based_on_mass_and_type():
+	var density = densities[planet_type]
+	var volume = custom_mass / density
+	var radius = pow((3 * volume) / (4 * PI), 1.0 / 3.0)
+	target_scale = Vector2(radius, radius) / 10000000
+
+func calculate_orbital_speed(planet) -> float:
+	if planet is RigidBody2D:
+		var r = global_position.distance_to(planet.global_position)  # Distance in km (assuming your units are km)
+		if r > 0:
+			var M = planet.get_custom_mass()  # Mass in kg
+			var orbital_speed = sqrt(G * M / r)  # Speed in km/s
+			return orbital_speed
+	return 0.0
+
 
 func get_custom_mass():
 	return custom_mass
+
+func get_current_velocity():
+	return linear_velocity

@@ -1,0 +1,39 @@
+[gd_scene load_steps=5 format=3 uid="uid://bjht6x66g5n6n"]
+
+[ext_resource type="Script" path="res://Scripts/Main.gd" id="1_rqmba"]
+[ext_resource type="Script" path="res://Scripts/CameraControl.gd" id="2_h1dmf"]
+[ext_resource type="PackedScene" uid="uid://vmk74h7b4ht2" path="res://Scenes/UI.tscn" id="3_fcx1o"]
+[ext_resource type="Texture2D" uid="uid://cb0qxjmda158v" path="res://Assets/Images/Stars Small_1.png" id="5_xa8r5"]
+
+[node name="Node2D" type="Node2D"]
+position = Vector2(-2, 3)
+script = ExtResource("1_rqmba")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+ignore_rotation = false
+zoom = Vector2(0.1, 0.1)
+limit_left = -100000000
+limit_top = -100000000
+limit_right = 100000000
+limit_bottom = 100000000
+script = ExtResource("2_h1dmf")
+
+[node name="Ui" parent="." instance=ExtResource("3_fcx1o")]
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+visible = false
+scroll_base_offset = Vector2(1000, 1000)
+scroll_limit_begin = Vector2(1000, 1000)
+scroll_limit_end = Vector2(1000, 1000)
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+texture_repeat = 3
+motion_mirroring = Vector2(4096, 4096)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer"]
+texture = ExtResource("5_xa8r5")
+centered = false
+region_rect = Rect2(4096, 4096, 4096, 4096)
+
+[node name="Line2D" type="Line2D" parent="."]
+default_color = Color(1, 0, 0, 1)

@@ -6,17 +6,17 @@ var zoomTarget : Vector2
 var dragStartMousePos = Vector2.ZERO
 var dragStartCameraPos = Vector2.ZERO
 var isDragging : bool = false
-
-# Tolerance value to consider zoom and zoomTarget as equal
 var tolerance = 0.0001
+
+var selected_planet = null  # Reference to the selected planet
 
 func _ready():
 	zoomTarget = zoom
 
 func _process(delta):
-	Zoom(delta)
 	SimplePan(delta)
 	ClickAndDrag()
+	Zoom(delta)
 
 func Zoom(delta):
 	if self.zoom.distance_to(zoomTarget) > tolerance:
@@ -52,14 +52,16 @@ func ClickAndDrag():
 		var moveVector = get_viewport().get_mouse_position() - dragStartMousePos
 		position = dragStartCameraPos - moveVector * 1/zoom.x
 
-# Function to set the zoom target from other scripts
 func set_zoom_target(target_zoom: Vector2):
 	zoomTarget = target_zoom
 
-# Example input handling to change the zoom target
-func _input(event):
+func _input(_event):
 	if Input.is_action_just_pressed("camera_zoom_in"):
 		set_zoom_target(zoomTarget * 1.1)
 		
 	if Input.is_action_just_pressed("camera_zoom_out"):
 		set_zoom_target(zoomTarget * 0.9)
+
+# Function to update the selected planet from the main game logic
+func update_selected_planet(planet):
+	selected_planet = planet

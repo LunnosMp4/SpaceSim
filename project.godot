@@ -11,9 +11,16 @@ config_version=5
 [application]
 
 config/name="SpaceSim"
-run/main_scene="res://Scenes/default.tscn"
+run/main_scene="res://Scenes/Main.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 
 [gui]
 
@@ -76,4 +83,6 @@ previous_planet={
 
 [rendering]
 
-environment/defaults/default_clear_color=Color(0, 0, 0, 1)
+anti_aliasing/screen_space_roughness_limiter/enabled=false
+environment/defaults/default_clear_color=Color(0.0743616, 0.102075, 0.140056, 1)
+anti_aliasing/quality/msaa_2d=1

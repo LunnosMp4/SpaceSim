@@ -1,0 +1,82 @@
+[gd_scene load_steps=3 format=3 uid="uid://vmk74h7b4ht2"]
+
+[ext_resource type="Script" path="res://Scripts/InfoPanel.gd" id="1_ob6m8"]
+[ext_resource type="FontFile" uid="uid://deworfwmk7fsn" path="res://Assets/Fonts/Orbitron-VariableFont_wght.ttf" id="2_aii3i"]
+
+[node name="Ui" type="Node2D"]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="InfoPanel" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 312.0
+offset_bottom = 259.0
+script = ExtResource("1_ob6m8")
+metadata/_edit_use_anchors_ = true
+
+[node name="MassLabel" type="Label" parent="CanvasLayer/InfoPanel"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = -3.0
+offset_right = 42.0
+offset_bottom = 20.0
+theme_override_fonts/font = ExtResource("2_aii3i")
+text = "Mass: N/A"
+metadata/_edit_use_anchors_ = true
+
+[node name="SpeedLabel" type="Label" parent="CanvasLayer/InfoPanel"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 22.0
+offset_right = 42.0
+offset_bottom = 45.0
+theme_override_fonts/font = ExtResource("2_aii3i")
+text = "Speed: N/A"
+metadata/_edit_use_anchors_ = true
+
+[node name="DistanceLabel" type="Label" parent="CanvasLayer/InfoPanel"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 46.0
+offset_right = 42.0
+offset_bottom = 69.0
+theme_override_fonts/font = ExtResource("2_aii3i")
+text = "Distance: N/A"
+metadata/_edit_use_anchors_ = true
+
+[node name="TypeLabel" type="Label" parent="CanvasLayer/InfoPanel"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 70.0
+offset_right = 42.0
+offset_bottom = 93.0
+theme_override_fonts/font = ExtResource("2_aii3i")
+text = "Type: N/A"
+metadata/_edit_use_anchors_ = true
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/InfoPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.000868056
+anchor_top = 0.00154321
+anchor_right = 0.000868056
+anchor_bottom = 0.00154321
+offset_left = 2.0
+offset_top = 97.0
+offset_right = 96.0
+offset_bottom = 120.0
+theme_override_fonts/font = ExtResource("2_aii3i")
+text = "Name: N/A"
+metadata/_edit_use_anchors_ = true
+
+[node name="OribitingLabel" type="Label" parent="CanvasLayer/InfoPanel"]
+layout_mode = 1
+anchors_preset = -1
+offset_left = 3.0
+offset_top = 123.0
+offset_right = 114.0
+offset_bottom = 146.0
+theme_override_fonts/font = ExtResource("2_aii3i")
+text = "Orbiting: N/A"
+metadata/_edit_use_anchors_ = true
