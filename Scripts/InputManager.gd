@@ -2,16 +2,21 @@ extends Node
 
 var main_node = null
 var planet_manager = null
+var ui_controller = null
+
 var start_position = Vector2()
 var is_dragging = false
 var bodies = null
 var selected_planet = null
-@onready var drag_line = get_node("/root/Node2D/Line2D")
+
+@onready var drag_line = get_node("/root/Node2D/DragLine")
+@onready var prediction_line = get_node("/root/Node2D/PredictionLine")
 @onready var camera = get_node("/root/Node2D/Camera2D")
 
-func _init(init_main_node, init_planet_manager):
-	main_node = init_main_node
-	planet_manager = init_planet_manager
+func _init(_main_node, _planet_manager, _ui_controller):
+	main_node = _main_node
+	planet_manager = _planet_manager
+	ui_controller = _ui_controller
 	
 func _process(_delta):
 	if is_instance_valid(selected_planet):
@@ -21,6 +26,7 @@ func _process(_delta):
 		
 	if is_dragging:
 		update_drag_line()
+		update_prediction_line()
 
 func _input(event):
 	handle_input(event)
@@ -32,14 +38,29 @@ func handle_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			handle_click(main_node.get_global_mouse_position(), event)
-				
-	if Input.is_action_just_pressed("next_planet"):
+
+	if Input.is_action_just_pressed("editor_mode"):
+		ui_controller.editor_panel_visibility(true)
+		
+	if Input.is_action_just_released("editor_mode"):
+		ui_controller.editor_panel_visibility(false)
+
+	if is_dragging and Input.is_action_just_released("editor_mode"):
+		cancel_drag()
+
+	if Input.is_action_just_pressed("camera_next_planet"):
 		bodies = get_tree().get_nodes_in_group("planets")
 		select_next_planet()
 
-	if Input.is_action_just_pressed("previous_planet"):
+	if Input.is_action_just_pressed("camera_previous_planet"):
 		bodies = get_tree().get_nodes_in_group("planets")
 		select_previous_planet()
+		
+	if Input.is_action_pressed("next_body"):
+		ui_controller.editor_selected_body(planet_manager.select_body(1))
+		
+	if Input.is_action_pressed("previous_body"):
+		ui_controller.editor_selected_body(planet_manager.select_body(-1))
 
 func handle_click(mouse_position, event):
 	if event.pressed:
@@ -48,10 +69,10 @@ func handle_click(mouse_position, event):
 		if clicked_body:
 			select_planet(clicked_body)
 			is_dragging = false
-		elif selected_planet == null:
+		elif selected_planet == null and Input.is_action_pressed("editor_mode"):
 			start_drag(start_position)
 	else:
-		if is_dragging:
+		if is_dragging and Input.is_action_pressed("editor_mode"):
 			end_drag(mouse_position)
 
 func select_planet(planet):
@@ -92,10 +113,30 @@ func update_drag_line():
 	if is_dragging:
 		drag_line.set_point_position(1, main_node.get_global_mouse_position())
 
+func update_prediction_line():
+	var zoom_factor = camera.zoom.length()
+	prediction_line.width = min(1.0 / zoom_factor * 5.0, 500.0)
+	var end_position = main_node.get_global_mouse_position()
+	var velocity = (end_position - start_position) * 0.774
+	prediction_line.clear_points()
+	
+	# Assuming you have a way to get the mass of the planet being created
+	var new_planet_mass = planet_manager.selected_body_type["mass"] * Constants.MASS_SCALE
+	var simulated_positions = simulate_trajectory(start_position, velocity, new_planet_mass)
+	
+	for pos in simulated_positions:
+		prediction_line.add_point(pos)
+
 func end_drag(end_position):
 	is_dragging = false
 	drag_line.clear_points()
+	prediction_line.clear_points()
 	planet_manager.create_body_with_velocity(start_position, end_position)
+	
+func cancel_drag():
+	is_dragging = false
+	drag_line.clear_points()
+	prediction_line.clear_points()
 
 func get_rigidbody_at_position(mouse_position):
 	var space_state = main_node.get_world_2d().direct_space_state
@@ -108,3 +149,25 @@ func get_rigidbody_at_position(mouse_position):
 			return body
 	return null
 
+func simulate_trajectory(position, velocity, mass):
+	var simulated_positions = []
+	var simulation_time = 10.0  # Simulate for 10 seconds
+	var time_step = get_physics_process_delta_time()
+	var current_position = position
+	var current_velocity = velocity
+	
+	for t in range(int(simulation_time / time_step)):
+		var acceleration = Vector2.ZERO
+		for body in get_tree().get_nodes_in_group("planets"):
+			var direction = body.global_position - current_position
+			var distance_squared = direction.length_squared()
+			if distance_squared < 0.1:
+				distance_squared = 0.1  # Avoid extreme forces
+			var force_magnitude = Constants.G * (body.get_custom_mass() * mass) / distance_squared
+			acceleration += direction.normalized() * force_magnitude / mass
+		
+		current_velocity += acceleration * time_step
+		current_position += current_velocity * time_step
+		simulated_positions.append(current_position)
+	
+	return simulated_positions

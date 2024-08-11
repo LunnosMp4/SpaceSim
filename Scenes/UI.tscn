@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://vmk74h7b4ht2"]
+[gd_scene load_steps=4 format=3 uid="uid://vmk74h7b4ht2"]
 
 [ext_resource type="Script" path="res://Scripts/InfoPanel.gd" id="1_ob6m8"]
 [ext_resource type="FontFile" uid="uid://deworfwmk7fsn" path="res://Assets/Fonts/Orbitron-VariableFont_wght.ttf" id="2_aii3i"]
+[ext_resource type="Script" path="res://Scripts/EditorPanel.gd" id="3_s110r"]
 
 [node name="Ui" type="Node2D"]
 
@@ -80,3 +81,34 @@ offset_bottom = 146.0
 theme_override_fonts/font = ExtResource("2_aii3i")
 text = "Orbiting: N/A"
 metadata/_edit_use_anchors_ = true
+
+[node name="EditorPanel" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 2.0
+offset_right = 1282.0
+offset_bottom = 720.0
+script = ExtResource("3_s110r")
+
+[node name="Title" type="Label" parent="CanvasLayer/EditorPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 585.0
+offset_right = -565.0
+offset_bottom = -694.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_aii3i")
+theme_override_font_sizes/font_size = 20
+text = "Editor Mode"
+
+[node name="SelectedBody" type="Label" parent="CanvasLayer/EditorPanel"]
+layout_mode = 0
+offset_top = 694.0
+offset_right = 72.0
+offset_bottom = 720.0
+theme_override_fonts/font = ExtResource("2_aii3i")
+theme_override_font_sizes/font_size = 20
+text = "Terran Wet"

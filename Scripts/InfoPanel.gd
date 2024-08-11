@@ -2,7 +2,7 @@ extends Control
 
 func update_info_panel(planet):
 	if planet:
-		get_node("MassLabel").text = "Mass: " + str(to_scientific_notation(planet.mass)) + " kg"
+		get_node("MassLabel").text = "Mass: " + str(to_scientific_notation(planet.mass / Constants.MASS_SCALE)) + " kg"
 		get_node("SpeedLabel").text = "Speed: " + str(snapped(planet.calculate_orbital_speed(planet.orbiting_planet), 0.01)) + " units/s"
 		get_node("DistanceLabel").text = "Distance to Orbit: " + str(snapped(planet.global_position.distance_to(planet.orbiting_planet.global_position), 0.01)) + " units"
 		get_node("TypeLabel").text = "Type: " + planet.planet_type

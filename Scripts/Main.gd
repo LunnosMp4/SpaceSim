@@ -8,8 +8,8 @@ var ui_controller = null
 func _ready():
 	planet_manager = preload("res://Scripts/PlanetManager.gd").new()
 	camera_controller = preload("res://Scripts/CameraControl.gd").new()
-	input_handler = preload("res://Scripts/InputManager.gd").new(self, planet_manager)
 	ui_controller = preload("res://Scripts/UIController.gd").new()
+	input_handler = preload("res://Scripts/InputManager.gd").new(self, planet_manager, ui_controller)
 
 	add_child(planet_manager)
 	add_child(camera_controller)

@@ -1,9 +1,7 @@
 extends RigidBody2D
 
-const G = 6.67430e-16
-
 var body_name = "Default"
-var custom_mass = 5.972e24
+var custom_mass = null
 var initial_velocity = Vector2()
 var last_force = Vector2()
 var is_colliding = false
@@ -21,8 +19,6 @@ var orbiting_planet = null  # The planet this body is orbiting around
 	"Ice World": preload("res://Planets/IceWorld/IceWorld.tscn"),
 	"Lava World": preload("res://Planets/LavaWorld/LavaWorld.tscn"),
 	"Asteroid": preload("res://Planets/Asteroids/Asteroid.tscn"),
-	"Black Hole": preload("res://Planets/BlackHole/BlackHole.tscn"),
-	"Galaxy": preload("res://Planets/Galaxy/Galaxy.tscn"),
 	"Star": preload("res://Planets/Star/Star.tscn"),
 }
 
@@ -36,8 +32,6 @@ var densities = {
 	"Ice World": 1600,
 	"Lava World": 4100,
 	"Asteroid": 2000,
-	"Black Hole": 1e18,
-	"Galaxy": 1e-21,
 	"Star": 1408,
 }
 
@@ -52,6 +46,9 @@ func _ready():
 	var planet_scene = planets[planet_type]
 	var planet = planet_scene.instantiate()
 	planet.set_global_position(Vector2(-50, -50))
+	var rng = RandomNumberGenerator.new()
+	var random_seed = rng.randi()
+	planet.set_seed(random_seed)
 	planet.randomize_colors()
 	add_child(planet)
 	add_to_group("planets")
@@ -94,7 +91,7 @@ func apply_gravity(body, _delta) -> float:
 			distance_squared = 0.1  # Avoid division by zero and extreme forces
 		if body.has_method("get_custom_mass"):
 			var body_mass = body.get_custom_mass()
-			var force_magnitude = G * (custom_mass * body_mass) / distance_squared
+			var force_magnitude = Constants.G * (custom_mass * body_mass) / distance_squared
 			var force = direction.normalized() * force_magnitude
 			apply_force(force * _delta, Vector2())  # Apply continuous force
 			last_force = force  # Store the last applied force for debug drawing
@@ -122,7 +119,7 @@ func scale_visual_and_collision():
 			child.scale = target_scale
 
 func calculate_scale_based_on_mass_and_type():
-	var density = densities[planet_type]
+	var density = densities[planet_type] * Constants.MASS_SCALE
 	var volume = custom_mass / density
 	var radius = pow((3 * volume) / (4 * PI), 1.0 / 3.0)
 	target_scale = Vector2(radius, radius) / 10000000
@@ -132,10 +129,9 @@ func calculate_orbital_speed(planet) -> float:
 		var r = global_position.distance_to(planet.global_position)  # Distance in km (assuming your units are km)
 		if r > 0:
 			var M = planet.get_custom_mass()  # Mass in kg
-			var orbital_speed = sqrt(G * M / r)  # Speed in km/s
+			var orbital_speed = sqrt(Constants.G * M / r)  # Speed in km/s
 			return orbital_speed
 	return 0.0
-
 
 func get_custom_mass():
 	return custom_mass

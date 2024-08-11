@@ -56,10 +56,10 @@ func set_zoom_target(target_zoom: Vector2):
 	zoomTarget = target_zoom
 
 func _input(_event):
-	if Input.is_action_just_pressed("camera_zoom_in"):
+	if Input.is_action_just_pressed("camera_zoom_in") and !Input.is_action_just_pressed("next_body"):
 		set_zoom_target(zoomTarget * 1.1)
 		
-	if Input.is_action_just_pressed("camera_zoom_out"):
+	if Input.is_action_just_pressed("camera_zoom_out") and !Input.is_action_just_pressed("previous_body"):
 		set_zoom_target(zoomTarget * 0.9)
 
 # Function to update the selected planet from the main game logic

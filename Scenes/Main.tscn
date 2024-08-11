@@ -35,5 +35,8 @@ texture = ExtResource("5_xa8r5")
 centered = false
 region_rect = Rect2(4096, 4096, 4096, 4096)
 
-[node name="Line2D" type="Line2D" parent="."]
+[node name="DragLine" type="Line2D" parent="."]
 default_color = Color(1, 0, 0, 1)
+
+[node name="PredictionLine" type="Line2D" parent="."]
+default_color = Color(0, 1, 0, 1)
