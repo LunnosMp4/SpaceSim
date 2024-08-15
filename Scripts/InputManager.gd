@@ -9,6 +9,9 @@ var is_dragging = false
 var bodies = null
 var selected_planet = null
 
+var cursor = preload("res://Assets/Images/SpaceUI/cursor_pointerFlat.png")
+var cursorHover = preload("res://Assets/Images/SpaceUI/cursor_hand.png")
+
 @onready var drag_line = get_node("/root/Node2D/DragLine")
 @onready var prediction_line = get_node("/root/Node2D/PredictionLine")
 @onready var camera = get_node("/root/Node2D/Camera2D")
@@ -31,6 +34,8 @@ func _process(_delta):
 func _input(event):
 	handle_input(event)
 
+var last_hover_state = false
+
 func handle_input(event):
 	if Input.is_action_just_pressed("camera_pan") and selected_planet:
 		selected_planet = null
@@ -38,6 +43,12 @@ func handle_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			handle_click(main_node.get_global_mouse_position(), event)
+
+	if Input.is_action_just_pressed("undo_action"):
+		planet_manager.restore_state()
+		
+	if Input.is_action_just_pressed("save_action"):
+		planet_manager.save_current_state()
 
 	if Input.is_action_just_pressed("editor_mode"):
 		ui_controller.editor_panel_visibility(true)
@@ -120,7 +131,6 @@ func update_prediction_line():
 	var velocity = (end_position - start_position) * 0.774
 	prediction_line.clear_points()
 	
-	# Assuming you have a way to get the mass of the planet being created
 	var new_planet_mass = planet_manager.selected_body_type["mass"] * Constants.MASS_SCALE
 	var simulated_positions = simulate_trajectory(start_position, velocity, new_planet_mass)
 	

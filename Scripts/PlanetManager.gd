@@ -1,7 +1,9 @@
 extends Node
 
-var planets = []
+@onready var notification_manager = get_node("/root/Node2D/NotificationManager")
+
 var selected_body_type = null
+var saved_states = []
 var body_types = [
 	{"type": "Terran Wet", "mass": 5.972e24},
 	{"type": "Terran Dry", "mass": 6.39e23},
@@ -32,9 +34,8 @@ func create_body(body_name, mass, type, position, velocity) -> RigidBody2D:
 		body.custom_mass = mass * Constants.MASS_SCALE
 		body.initial_velocity = velocity
 		body.planet_type = type
+		body.global_position = position
 		add_child(body_instance)
-		body_instance.global_position = position
-		planets.append(body)
 		return body
 	return null
 
@@ -42,20 +43,20 @@ func generate_planet_name() -> String:
 	var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	var numbers = "0123456789"
 	var body_name = ""
-	
-	# Generate a random prefix with letters
+
 	for i in range(3):
 		body_name += letters[randi() % letters.length()]
-		
+
 	body_name += "-"
-	
-	# Generate a random suffix with numbers
+
 	for i in range(2):
 		body_name += numbers[randi() % numbers.length()]
-	
+
 	return body_name
 
 func create_body_with_velocity(start_pos, end_pos):
+	save_current_state()
+	
 	if selected_body_type == null:
 		selected_body_type = body_types[0]
 
@@ -65,13 +66,11 @@ func create_body_with_velocity(start_pos, end_pos):
 		body.custom_mass = selected_body_type["mass"] * Constants.MASS_SCALE
 		body.planet_type = selected_body_type["type"]
 		body.body_name = generate_planet_name()
-		
-		add_child(body_instance)
-		body_instance.global_position = start_pos
-		
+		body.global_position = start_pos
 		var velocity = (end_pos - start_pos) * 0.1
 		body.linear_velocity = velocity
-		planets.append(body)
+		add_child(body_instance)
+		
 
 func select_body(direction) -> String:
 	var current_index = body_types.find(selected_body_type)
@@ -82,3 +81,51 @@ func select_body(direction) -> String:
 		new_index = 0
 	selected_body_type = body_types[new_index]
 	return selected_body_type["type"]
+
+func save_current_state():
+	var current_state = []
+	for body in get_tree().get_nodes_in_group("planets"):
+		var state = {
+			"name": body.body_name,
+			"mass": body.custom_mass,
+			"type": body.planet_type,
+			"position": body.global_position,
+			"velocity": body.linear_velocity,
+			"initial": body.initial_velocity
+		}
+		current_state.append(state)
+
+	saved_states.append(current_state)
+	
+	notification_manager.notify("Save")
+
+	await get_tree().create_timer(0.1).timeout
+
+func restore_state():
+	if saved_states.size() == 0:
+		notification_manager.notify("No State to Restore")
+		return
+
+	var last_state = saved_states.pop_back()  # Get the last saved state
+
+	# Remove all current planets
+	for body_instance in get_tree().get_nodes_in_group("planets"):
+		body_instance.get_parent().queue_free()
+
+	notification_manager.notify("Undo")
+
+	await get_tree().create_timer(0.1).timeout
+
+	# Restore the last saved state
+	for state in last_state:
+		var body_instance = load("res://Scenes/Planet.tscn").instantiate()
+		var body = body_instance.get_node("Planet")
+		if body is RigidBody2D:
+			body.body_name = state["name"]
+			body.custom_mass = state["mass"]
+			body.planet_type = state["type"]
+			body.global_position = state["position"]
+			body.linear_velocity = state["velocity"]
+			add_child(body_instance)
+			
+

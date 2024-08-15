@@ -2,19 +2,22 @@ extends Control
 
 func update_info_panel(planet):
 	if planet:
-		get_node("MassLabel").text = "Mass: " + str(to_scientific_notation(planet.mass / Constants.MASS_SCALE)) + " kg"
-		get_node("SpeedLabel").text = "Speed: " + str(snapped(planet.calculate_orbital_speed(planet.orbiting_planet), 0.01)) + " units/s"
-		get_node("DistanceLabel").text = "Distance to Orbit: " + str(snapped(planet.global_position.distance_to(planet.orbiting_planet.global_position), 0.01)) + " units"
+		self.visible = true
+		var mass_text = "Mass: " + str(to_scientific_notation(planet.mass / Constants.MASS_SCALE)) + " kg"
+		var speed_text = "Speed: " + pad_string(str(snapped(planet.calculate_orbital_speed(planet.orbiting_planet), 0.1)), 1) + " u/s"
+		var distance_text = "Distance to Orbit: " + pad_string(str(snapped(planet.global_position.distance_to(planet.orbiting_planet.global_position), 0.1)), 1) + " u"
+
+		get_node("MassLabel").text = mass_text
+		get_node("SpeedLabel").text = speed_text
+		get_node("DistanceLabel").text = distance_text
 		get_node("TypeLabel").text = "Type: " + planet.planet_type
-		get_node("NameLabel").text = "Name: " + planet.body_name
-		get_node("OribitingLabel").text = "Orbiting: " + planet.orbiting_planet.body_name
+		get_node("NameLabel").text = planet.body_name
+		get_node("OrbitingLabel").text = "Orbiting: " + planet.orbiting_planet.body_name
 	else:
-		get_node("MassLabel").text = ""
-		get_node("SpeedLabel").text = ""
-		get_node("DistanceLabel").text = ""
-		get_node("TypeLabel").text = ""
-		get_node("NameLabel").text = ""
-		get_node("OribitingLabel").text = ""
+		self.visible = false
+
+func pad_string(text: String, width: int) -> String:
+	return text.pad_decimals(width)
 
 func to_scientific_notation(value: float, max_digits: int = 4) -> String:
 	var value_str = str(value)

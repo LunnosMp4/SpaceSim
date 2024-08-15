@@ -10,6 +10,9 @@ func _ready():
 	camera_controller = preload("res://Scripts/CameraControl.gd").new()
 	ui_controller = preload("res://Scripts/UIController.gd").new()
 	input_handler = preload("res://Scripts/InputManager.gd").new(self, planet_manager, ui_controller)
+	
+	Engine.time_scale *= 1
+	Engine.physics_ticks_per_second *= 1
 
 	add_child(planet_manager)
 	add_child(camera_controller)

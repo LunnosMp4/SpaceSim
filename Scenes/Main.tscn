@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://bjht6x66g5n6n"]
+[gd_scene load_steps=6 format=3 uid="uid://bjht6x66g5n6n"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_rqmba"]
 [ext_resource type="Script" path="res://Scripts/CameraControl.gd" id="2_h1dmf"]
 [ext_resource type="PackedScene" uid="uid://vmk74h7b4ht2" path="res://Scenes/UI.tscn" id="3_fcx1o"]
+[ext_resource type="Script" path="res://Scripts/NotificationManager.gd" id="5_dbc2y"]
 [ext_resource type="Texture2D" uid="uid://cb0qxjmda158v" path="res://Assets/Images/Stars Small_1.png" id="5_xa8r5"]
 
 [node name="Node2D" type="Node2D"]
@@ -40,3 +41,10 @@ default_color = Color(1, 0, 0, 1)
 
 [node name="PredictionLine" type="Line2D" parent="."]
 default_color = Color(0, 1, 0, 1)
+
+[node name="NotificationManager" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("5_dbc2y")

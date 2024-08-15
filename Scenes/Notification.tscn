@@ -1,0 +1,67 @@
+[gd_scene load_steps=6 format=3 uid="uid://dnignno66i2pp"]
+
+[ext_resource type="Theme" uid="uid://ceipxr0e6r8re" path="res://Scenes/Default.tres" id="1_3gnq4"]
+[ext_resource type="Texture2D" uid="uid://ccvwslfhdfikt" path="res://Assets/Images/uipackSpace_vector.svg" id="2_jia11"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_py21o"]
+texture = ExtResource("2_jia11")
+texture_margin_left = 14.4995
+texture_margin_top = 7.16192
+texture_margin_right = 7.43218
+texture_margin_bottom = 14.8644
+region_rect = Rect2(559, 122, 100, 100)
+
+[sub_resource type="Animation" id="Animation_qmij8"]
+resource_name = "Fade"
+length = 1.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CanvasLayer/Panel:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.8, 1.25),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ior0v"]
+_data = {
+"Fade": SubResource("Animation_qmij8")
+}
+
+[node name="Notification" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="Panel" parent="CanvasLayer"]
+offset_right = 105.0
+offset_bottom = 37.0
+theme = ExtResource("1_3gnq4")
+theme_override_styles/panel = SubResource("StyleBoxTexture_py21o")
+
+[node name="Label" type="Label" parent="CanvasLayer/Panel"]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 6.0
+offset_right = 67.0
+offset_bottom = 29.0
+theme = ExtResource("1_3gnq4")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "TEXT"
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 1.5
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_ior0v")
+}
