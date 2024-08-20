@@ -56,6 +56,10 @@ func ClickAndDrag():
 		position = dragStartCameraPos - moveVector * 1/zoom.x
 
 func set_zoom_target(target_zoom: Vector2):
+	if target_zoom.x < 0.0003:
+		target_zoom = Vector2(0.0003, 0.0003)
+	if target_zoom.x > 30:
+		target_zoom = Vector2(30, 30)
 	zoomTarget = target_zoom
 
 func _input(_event):

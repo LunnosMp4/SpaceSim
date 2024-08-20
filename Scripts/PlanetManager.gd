@@ -128,4 +128,3 @@ func restore_state():
 			body.linear_velocity = state["velocity"]
 			add_child(body_instance)
 			
-

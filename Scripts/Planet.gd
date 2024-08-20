@@ -88,14 +88,14 @@ func apply_gravity(body, _delta) -> float:
 		var direction = body.global_position - global_position
 		var distance_squared = direction.length_squared()
 		if distance_squared < 0.1:
-			distance_squared = 0.1  # Avoid division by zero and extreme forces
+			distance_squared = 0.1
 		if body.has_method("get_custom_mass"):
 			var body_mass = body.get_custom_mass()
 			var force_magnitude = Constants.G * (custom_mass * body_mass) / distance_squared
 			var force = direction.normalized() * force_magnitude
-			apply_force(force * _delta, Vector2())  # Apply continuous force
-			last_force = force  # Store the last applied force for debug drawing
-			return force_magnitude  # Return the force magnitude for orbit calculation
+			apply_force(force * _delta, Vector2())
+			last_force = force
+			return force_magnitude
 	return 0.0
 
 func check_collision_proximity(body):
@@ -107,7 +107,7 @@ func check_collision_proximity(body):
 			handle_collision(body)
 
 func get_radius():
-	return target_scale.x * 50
+	return target_scale.x * 55
 
 func handle_collision(body):
 	if body.mass > self.mass:
@@ -126,10 +126,10 @@ func calculate_scale_based_on_mass_and_type():
 
 func calculate_orbital_speed(planet) -> float:
 	if planet is RigidBody2D:
-		var r = global_position.distance_to(planet.global_position)  # Distance in km (assuming your units are km)
+		var r = global_position.distance_to(planet.global_position)
 		if r > 0:
-			var M = planet.get_custom_mass()  # Mass in kg
-			var orbital_speed = sqrt(Constants.G * M / r)  # Speed in km/s
+			var M = planet.get_custom_mass()
+			var orbital_speed = sqrt(Constants.G * M / r)
 			return orbital_speed
 	return 0.0
 

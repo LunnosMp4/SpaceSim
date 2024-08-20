@@ -166,10 +166,10 @@ text = "Editor Mode"
 
 [node name="SelectPanel" type="Panel" parent="CanvasLayer/EditorPanel"]
 layout_mode = 0
-offset_left = 10.0
-offset_top = 530.0
-offset_right = 208.0
-offset_bottom = 707.0
+offset_left = 20.0
+offset_top = 523.0
+offset_right = 218.0
+offset_bottom = 700.0
 theme = ExtResource("3_6jvpd")
 theme_override_styles/panel = SubResource("StyleBoxTexture_eoaba")
 

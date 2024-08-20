@@ -15,8 +15,8 @@ default_color = Color(1, 1, 1, 0.588235)
 
 [node name="Planet" type="RigidBody2D" parent="."]
 continuous_cd = 1
-max_contacts_reported = 1
 contact_monitor = true
+max_contacts_reported = 1
 script = ExtResource("1_3g1mn")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Planet"]

@@ -30,7 +30,6 @@ func notify(text):
 func _on_Notification_timeout():
 	if notifications.size() == 0:
 		return
-		
 
 	var notification_instance = notifications.pop_front() 
 	notification_instance.queue_free()
@@ -42,4 +41,3 @@ func _on_Notification_timeout():
 			y += notifications[j].get_rect().size.y + 5
 		var panel = notification.get_node("CanvasLayer/Panel")
 		panel.set_position(Vector2(get_viewport_rect().size.x - panel.get_rect().size.x - 20, y))
-

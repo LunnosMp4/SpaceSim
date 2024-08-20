@@ -36,4 +36,3 @@ func update_selected_body(body_type):
 	planet.set_position(Vector2(40, 50))
 	planet.set_light(Vector2(0.3, 0.5))
 	SelectPanel.add_child(planet)
-
